@@ -12,7 +12,7 @@ Visual examples (taken by yours truly :wink:):
 
 ![Horizontal photo before processing.](./src/images/horizontal.jpg)
 
-![Horizontal photo after processing.](./src/images/insagramize_horizontal.jpg)
+![Horizontal photo after processing.](./src/images/instagramize_horizontal.jpg)
 
 - Vertical photo:
 
