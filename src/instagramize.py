@@ -4,16 +4,16 @@ from PIL import Image, ImageDraw, ImageFilter
 
 INSTAGRAM_PHOTO_SIZE = 2048
 
-if len(sys.argv) > 2:
+if len(sys.argv) > 3:
     print("Too many arguments provided. Exiting.")
     sys.exit()
 
-if len(sys.argv) == 2:
+if len(sys.argv) == 3:
     IMAGE_FILE = sys.argv[1]
-    GAUSSIAN_BLUR_RADIUS = sys.argv[2]
-elif len(sys.argv) == 1:
+    GAUSSIAN_BLUR_RADIUS = int(sys.argv[2])
+elif len(sys.argv) == 2:
     IMAGE_FILE = sys.argv[1]
-    GAUSSIAN_BLUR_RADIUS = 25
+    GAUSSIAN_BLUR_RADIUS = 15
 else:
     print("Not enough arguments provided. Exiting.")
     sys.exit()
@@ -24,46 +24,51 @@ imageBackground = Image.open(IMAGE_FILE)
 
 # some math
 width, height = image.size
-ratio = width / height
-incRatioSize = INSTAGRAM_PHOTO_SIZE * ratio
-decRatioSize = INSTAGRAM_PHOTO_SIZE / ratio
-x = (incRatioSize - INSTAGRAM_PHOTO_SIZE) / 2
-y = (INSTAGRAM_PHOTO_SIZE - decRatioSize) / 2
+if width > height:
+    ratio = width / height
+else:
+    ratio = height / width
+incRatioSize = int(round(INSTAGRAM_PHOTO_SIZE * ratio))
+decRatioSize = int(round(INSTAGRAM_PHOTO_SIZE / ratio))
+x = int(round((incRatioSize - INSTAGRAM_PHOTO_SIZE) / 2))
+y = int(round((INSTAGRAM_PHOTO_SIZE - decRatioSize) / 2))
 
 # Prepare image and background sizes - background fills 2048 square, image is centered on it
 if width > height:
     # Image background goes to height of instagram square
-    imageBackground.resize(incRatioSize,INSTAGRAM_PHOTO_SIZE)
-    
-    # Blur image background
-    blurredBackground = imageBackground.filter(ImageFilter.GaussianBlur(GAUSSIAN_BLUR_RADIUS))
+    imageBackground = imageBackground.resize((incRatioSize,INSTAGRAM_PHOTO_SIZE))
 
     # Image width goes to width of instagram square, height becomes the decreased ratio
-    image.resize(INSTAGRAM_PHOTO_SIZE, decRatioSize)
+    image = image.resize((INSTAGRAM_PHOTO_SIZE, decRatioSize))
+    
+    # Blur image background
+    imageBackground = imageBackground.filter(ImageFilter.GaussianBlur(GAUSSIAN_BLUR_RADIUS))
 
     # see calculation above for x and y
-    blurredBackground.paste(image, (x, y))
+    imageBackground.paste(image, (x, y))
 
-    # crop out the desired 2048x2048 square
-    blurredBackground.crop(x, 0, 2048, x + 2048)
+    # crop out the desired 2048 x 2048 square
+    imageBackground = imageBackground.crop((x, 0, x + INSTAGRAM_PHOTO_SIZE, INSTAGRAM_PHOTO_SIZE))
 else:
     # Image background goes to width of instagram square
-    imageBackground.resize(incRatioSize, INSTAGRAM_PHOTO_SIZE)
-
-    # Blur image background
-    blurredBackground = imageBackground.filter(ImageFilter.GaussianBlur(GAUSSIAN_BLUR_RADIUS))
+    imageBackground = imageBackground.resize((INSTAGRAM_PHOTO_SIZE, incRatioSize))
 
     # Image height goes to height of instagram square, width becomes the decreased ratio
-    image.resize(decRatioSize, INSTAGRAM_PHOTO_SIZE)
+    image = image.resize((decRatioSize, INSTAGRAM_PHOTO_SIZE))
+
+    # Blur image background
+    imageBackground = imageBackground.filter(ImageFilter.GaussianBlur(GAUSSIAN_BLUR_RADIUS))
 
     # and its starting x,y coordinates for paste inverse of that of other configuration
-    blurredBackground.paste(image, (y, x))
+    imageBackground.paste(image, (y, x))
 
-    # crop out the desired 2048x2048 square
-    blurredBackground.crop(0, x, x + 2048, 2048)
+    # crop out the desired 2048 x 2048 square
+    imageBackground = imageBackground.crop((0, x, INSTAGRAM_PHOTO_SIZE, x + INSTAGRAM_PHOTO_SIZE))
 
 # save file to desktop
-blurredBackground.save(os.getcwd() + 'instagramized_' + sys.argv[1])
+imageBackground.save(os.getcwd() + '/instagramize_' + sys.argv[1])
+
+print("Done. Image exported to " + 'instagramize_' + sys.argv[1])
 
 
 
