@@ -1,4 +1,4 @@
-# Instagramizer
+# Instagramize
 
 This is a Python 3 commandline tool which essentially automates what I was doing by hand before in GIMP. 
 
