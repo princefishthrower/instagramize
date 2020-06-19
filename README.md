@@ -1,8 +1,15 @@
 # Instagramizer
 
-This is a Python 3 script which essentially automates what I was doing by hand before in GIMP. It takes two arguments: the first is the image to 'instagramify' and the second OPTIONAL argument is the pixel radius of the gaussian blur applied to the background. The default is . Ex:
+This is a Python 3 commandline tool which essentially automates what I was doing by hand before in GIMP. 
 
-`python3 instagramizer.py mycoolphoto.jpg 10`
+It takes two arguments: 
+
+1. (Required) the image file name to 'instagramize' 
+2. (Optional) the pixel radius of the gaussian blur applied to the background. The default is 10. 
+
+Ex:
+
+`python3 instagramizer.py mycoolphoto.jpg 15`
 
 This will create an instagramized photo under the same directory with the name `instagramized_mycoolphoto.jpg`.
 

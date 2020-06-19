@@ -13,7 +13,7 @@ if len(sys.argv) == 3:
     GAUSSIAN_BLUR_RADIUS = int(sys.argv[2])
 elif len(sys.argv) == 2:
     IMAGE_FILE = sys.argv[1]
-    GAUSSIAN_BLUR_RADIUS = 15
+    GAUSSIAN_BLUR_RADIUS = 10
 else:
     print("Not enough arguments provided. Exiting.")
     sys.exit()
