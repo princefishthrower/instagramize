@@ -9,6 +9,10 @@ It takes two arguments:
 
 Ex:
 
+`python3 instagramizer.py mycoolphoto.jpg`
+
+or
+
 `python3 instagramizer.py mycoolphoto.jpg 15`
 
 This will create an instagramized photo under the same directory with the name `instagramized_mycoolphoto.jpg`.
