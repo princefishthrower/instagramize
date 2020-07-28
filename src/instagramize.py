@@ -1,6 +1,7 @@
 import sys
 import os
-from PIL import Image, ImageDraw, ImageFilter
+import io
+from PIL import Image, ImageDraw, ImageFilter, ImageCms
 
 INSTAGRAM_PHOTO_SIZE = 2048
 
@@ -21,6 +22,11 @@ else:
 # Open two versions of the image - one for the actual image to show and one to use as background
 image = Image.open(IMAGE_FILE)
 imageBackground = Image.open(IMAGE_FILE)
+
+# Get original color profile so it can be preserved
+iccProfile = image.info.get('icc_profile')
+iccBytes = io.BytesIO(iccProfile)
+originalColorProfile = ImageCms.ImageCmsProfile(iccBytes)
 
 # some math
 width, height = image.size
@@ -65,8 +71,8 @@ else:
     # crop out the desired 2048 x 2048 square
     imageBackground = imageBackground.crop((0, x, INSTAGRAM_PHOTO_SIZE, x + INSTAGRAM_PHOTO_SIZE))
 
-# save file to desktop
-imageBackground.save(os.getcwd() + '/instagramize_' + sys.argv[1])
+# Save file to desktop, preserving color profile of image
+imageBackground.save(os.getcwd() + '/instagramize_' + sys.argv[1], icc_profile=originalColorProfile.tobytes())
 
 print("Done. Image exported to " + 'instagramize_' + sys.argv[1])
 
