@@ -14,6 +14,36 @@ INSTAGRAM_PHOTO_SIZE = 2048
 BACKGROUND_GAUSSIAN_BLUR_RADIUS = 0
 BORDER_SIZE = 0
 
+# Check for help flag
+if len(sys.argv) > 1 and (sys.argv[1] == '--help' or sys.argv[1] == '-h'):
+    print("Instagramize - Convert images to Instagram-ready 2048x2048 squares")
+    print("")
+    print("Usage:")
+    print("  python3 instagramize.py <image_file> [blur_radius] [border_size]")
+    print("")
+    print("Arguments:")
+    print("  image_file    (Required) Path to the image file to process")
+    print("  blur_radius   (Optional) Gaussian blur radius for background (default: 0)")
+    print("  border_size   (Optional) White border size around the image (default: 0)")
+    print("")
+    print("Examples:")
+    print("  python3 instagramize.py mycoolphoto.jpg")
+    print("    - Basic conversion with no blur or border")
+    print("")
+    print("  python3 instagramize.py mycoolphoto.jpg 15")
+    print("    - Add 15px gaussian blur to the background")
+    print("")
+    print("  python3 instagramize.py mycoolphoto.jpg 15 10")
+    print("    - Add 15px blur and 10px white border")
+    print("")
+    print("  python3 instagramize.py nature.jpg 20 5")
+    print("    - Heavy blur (20px) with small border (5px)")
+    print("")
+    print("Output:")
+    print("  Creates 'instagramize_<original_filename>' in the current directory")
+    print("  Final image will be 2048x2048 pixels, perfect for Instagram")
+    sys.exit()
+
 if len(sys.argv) > MAX_ARGUMENTS:
     print("Too many arguments provided. Exiting.")
     sys.exit()
@@ -61,17 +91,21 @@ else:
 paste_x = int(round((INSTAGRAM_PHOTO_SIZE - image_resize_width) / 2))
 paste_y = int(round((INSTAGRAM_PHOTO_SIZE - image_resize_height) / 2))
 
-# Calculate background dimensions
-background_resize_width = int(round(INSTAGRAM_PHOTO_SIZE * image_aspect_ratio))
-background_resize_height = INSTAGRAM_PHOTO_SIZE
-
-# Calculate background crop dimensions
-background_crop_dimension = int(round(abs(INSTAGRAM_PHOTO_SIZE - background_resize_width) / 2))
-background_crop_tuple = (background_crop_dimension, 0, background_crop_dimension + INSTAGRAM_PHOTO_SIZE, INSTAGRAM_PHOTO_SIZE)
-
-# flip all the tuples if height is greater than width
-if original_image_height > original_image_width:
-    background_crop_tuple = (background_crop_tuple[1], background_crop_tuple[0], background_crop_tuple[3], background_crop_tuple[2])
+# Calculate background dimensions to ensure it covers the entire canvas
+if image_aspect_ratio >= 1:  # landscape or square
+    # For landscape images, make height = INSTAGRAM_PHOTO_SIZE and scale width proportionally
+    background_resize_height = INSTAGRAM_PHOTO_SIZE
+    background_resize_width = int(round(INSTAGRAM_PHOTO_SIZE * image_aspect_ratio))
+    # Crop from the sides
+    background_crop_dimension = int(round(abs(INSTAGRAM_PHOTO_SIZE - background_resize_width) / 2))
+    background_crop_tuple = (background_crop_dimension, 0, background_crop_dimension + INSTAGRAM_PHOTO_SIZE, INSTAGRAM_PHOTO_SIZE)
+else:  # portrait
+    # For portrait images, make width = INSTAGRAM_PHOTO_SIZE and scale height proportionally
+    background_resize_width = INSTAGRAM_PHOTO_SIZE
+    background_resize_height = int(round(INSTAGRAM_PHOTO_SIZE / image_aspect_ratio))
+    # Crop from top and bottom
+    background_crop_dimension = int(round(abs(INSTAGRAM_PHOTO_SIZE - background_resize_height) / 2))
+    background_crop_tuple = (0, background_crop_dimension, INSTAGRAM_PHOTO_SIZE, background_crop_dimension + INSTAGRAM_PHOTO_SIZE)
 
 # Draw white background (if border size is 0, this will be immediately rewritten in either of the paste methods below, so 'safe' to do always)
 white_rectangle_x0 = paste_x - BORDER_SIZE
